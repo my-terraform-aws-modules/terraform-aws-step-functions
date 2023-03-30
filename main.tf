@@ -1,22 +1,32 @@
 provider "aws" {
-  region = var.region
-  
+  region = var.region 
 }
-
-data "local_file" "state_machine_definition" {
-  filename = "${path.module}/${var.definition_file_name}"
-}
-
-data "local_file" "iam_policy" {
-  filename = "${path.module}/${var.policy_file_name}"
-}
-
 // Create state machine
 resource "aws_sfn_state_machine" "sfn_state_machine" {
   count = var.create_sfn ? 1 : 0
-  name       = "${var.state_machine_name}-${var.environment}"
+  name       = "${var.environment}-${var.state_machine_name}"
   role_arn   = var.use_existing_role ? var.role_arn : aws_iam_role.iam_for_sfn.arn
-  definition = data.local_file.state_machine_definition.content
+  definition = var.step_function_defination
+  /* example of defination file
+  definition = <<EOF
+{
+  "Comment": "A Hello World example of the Amazon States Language using Pass states",
+  "StartAt": "Hello",
+  "States": {
+    "Hello": {
+      "Type": "Pass",
+      "Result": "Hello",
+      "Next": "World"
+    },
+    "World": {
+      "Type": "Pass",
+      "Result": "World",
+      "End": true
+    }
+  }
+}
+EOF
+*/
   type       = upper(var.type)
   logging_configuration {
     log_destination        = "${aws_cloudwatch_log_group.state_machine_log_group.arn}:*"
@@ -30,11 +40,11 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
   }
 }
 
-// Create log group for state machine to log to
+// Create log group for state machine
 resource "aws_cloudwatch_log_group" "state_machine_log_group" {
-  name              = "/aws/vendedlogs/states/${var.cloudwatch_log_group_name}"
+  name              = var.cloudwatch_log_group_name
   tags              = var.cloudwatch_log_group_tags
-  kms_key_id        = var.enable_sfn_encyption ? var.cloudwatch_log_group_kms_key_arn : 0
+  #kms_key_id        = var.enable_sfn_encyption ? var.cloudwatch_log_group_kms_key_arn : 0
   retention_in_days = var.cloudwatch_log_group_retention_days
 }
 
@@ -99,7 +109,7 @@ resource "aws_iam_policy" "policy_sfn_statemachine" {
                 "states:StopExecution",
                 "states:ListExecution"
             ],
-            "Resource": "${aws_sfn_state_machine.sfn_state_machine.arn}",
+            "Resource": "${aws_sfn_state_machine.sfn_state_machine[0].arn}",
             "Effect": "Allow"
         }
     ]

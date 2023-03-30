@@ -1,16 +1,12 @@
 # Common variables
 variable "region" {
   type = string
-  default = "eu-west-2"
-  
+  default = "eu-west-1"
 }
-
-variable "project" {
-  description = "Project name to be used as a reference in names/tags."
-  type        = string
-  default = ""
+variable "create_sfn" {
+  type = bool
+  default = true
 }
-
 variable "environment" {
   description = "The environment to deploy to."
   type        = string
@@ -20,19 +16,20 @@ variable "environment" {
     error_message = "Valid values for var: environment are (dev, prod, sit, snd, uat)."
   }
 }
-
-variable "state_machine_tags" {
-  description = "The tags provided by the client module. To be merged with internal tags"
-  type        = map(string)
-  default     = {}
-}
-
 variable "state_machine_name" {
-  type        = string
-  description = "The name of the state machine."
-  default = "demo"
+  type = string
+  default = "demostepfunction"
 }
-
+variable "use_existing_role" {
+  type = bool
+  default = false
+}
+variable "role_arn" {
+  type = string
+  default = ""
+}
+variable "step_function_defination" {}
+  
 variable "type" {
   type        = string
   description = "Determines whether a Standard or Express state machine is created."
@@ -44,8 +41,6 @@ variable "include_execution_data" {
   description = "Determines whether execution data is included in your log. When set to false, data is excluded."
   default = false
 }
-
-
 variable "logging_configuration_level" {
   type        = string
   description = "Defines which category of execution history events are logged. Valid values: ALL, ERROR, FATAL, OFF"
@@ -56,6 +51,16 @@ variable "logging_configuration_level" {
     ], var.logging_configuration_level)
     error_message = "Must be one of the allowed values."
   }
+}
+variable "state_machine_tags" {
+  description = "The tags provided by the client module. To be merged with internal tags"
+  type        = map(string)
+  default     = {}
+}
+variable "xray_tracing_enabled" {
+  type        = bool
+  description = "When set to true, AWS X-Ray tracing is enabled."
+  default     = true
 }
 
 variable "cloudwatch_log_group_name" {
@@ -96,18 +101,15 @@ variable "definition_file_name" {
 variable "policy_file_name" {
   type        = string
   description = "The name of the file that contains the iam policy. File should be in JSON format."
+  default = ""
 }
 
-variable "xray_tracing_enabled" {
-  type        = bool
-  description = "When set to true, AWS X-Ray tracing is enabled."
-  default     = true
-}
+
 
 variable "cloudwatch_log_group_retention_days" {
   type        = number
   description = "Specifies the number of days you want to retain log events in the specified log group. Possible values are: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1096, 1827, 2192, 2557, 2922, 3288, 3653, and 0. If you select 0, the events in the log group are always retained and never expire."
-  default = null
+  default = 1
   validation {
     condition = contains([
       0, 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1096, 1827, 2192, 2557, 2922, 3288, 3653
