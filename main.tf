@@ -5,7 +5,7 @@ provider "aws" {
 resource "aws_sfn_state_machine" "sfn_state_machine" {
   count = var.create_sfn ? 1 : 0
   name       = "${var.environment}-${var.state_machine_name}"
-  role_arn   = var.create_sfn_role ? aws_iam_role.iam_for_sfn.arn : var.custom_sfn_role 
+  role_arn   = var.create_sfn_role ? aws_iam_role.iam_for_sfn[0].arn : var.custom_sfn_role 
   definition = var.step_function_defination
   /* example of defination file
   definition = <<EOF
