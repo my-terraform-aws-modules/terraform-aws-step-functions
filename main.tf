@@ -44,7 +44,7 @@ EOF
 resource "aws_cloudwatch_log_group" "state_machine_log_group" {
   name              = var.cloudwatch_log_group_name
   tags              = var.cloudwatch_log_group_tags
-  kms_key_id        = var.enable_sfn_encyption ? var.cloudwatch_log_group_kms_key_arn : 0
+  kms_key_id        = var.enable_sfn_encryption ? var.cloudwatch_log_group_kms_key_arn : 0
   retention_in_days = var.cloudwatch_log_group_retention_days
 }
 

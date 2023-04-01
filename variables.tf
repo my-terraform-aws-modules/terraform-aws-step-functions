@@ -66,7 +66,7 @@ variable "cloudwatch_log_group_tags" {
   type        = map(string)
   default     = {}
 }
-variable "enable_sfn_encyption" {
+variable "enable_sfn_encryption" {
   type = bool
   default = false  
 }
