@@ -20,11 +20,11 @@ variable "state_machine_name" {
   type = string
   default = "demostepfunction"
 }
-variable "use_existing_role" {
+variable "create_sfn_role" {
   type = bool
   default = false
 }
-variable "role_arn" {
+variable "custom_sfn_role" {
   type = string
   default = ""
 }

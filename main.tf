@@ -5,7 +5,7 @@ provider "aws" {
 resource "aws_sfn_state_machine" "sfn_state_machine" {
   count = var.create_sfn ? 1 : 0
   name       = "${var.environment}-${var.state_machine_name}"
-  role_arn   = var.use_existing_role ? var.role_arn : aws_iam_role.iam_for_sfn.arn
+  role_arn   = var.create_sfn_role ? aws_iam_role.iam_for_sfn.arn : var.custom_sfn_role 
   definition = var.step_function_defination
   /* example of defination file
   definition = <<EOF
@@ -65,6 +65,7 @@ data "aws_iam_policy_document" "sfn_assume_policy" {
 
 // Create IAM role for state machine
 resource "aws_iam_role" "iam_for_sfn" {
+  count = var.create_sfn_role ? 1 :0
   name               = "${var.iam_role_name}-${var.environment}"
   assume_role_policy = data.aws_iam_policy_document.sfn_assume_policy.json
 }
