@@ -66,7 +66,7 @@ data "aws_iam_policy_document" "sfn_assume_policy" {
 // Create IAM role for state machine
 resource "aws_iam_role" "iam_for_sfn" {
   count = var.create_sfn_role ? 1 :0
-  name               = "${var.iam_role_name}-${var.environment}"
+  name               = "${var.sfn_iam_role_name}-${var.environment}"
   assume_role_policy = data.aws_iam_policy_document.sfn_assume_policy.json
 }
 

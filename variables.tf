@@ -75,7 +75,7 @@ variable "cloudwatch_log_group_tags" {
   default     = {}
 }
 
-variable "iam_role_name" {
+variable "sfn_iam_role_name" {
   type        = string
   description = "The name given to the iam role used by the state machine."
   default = "demorole"
