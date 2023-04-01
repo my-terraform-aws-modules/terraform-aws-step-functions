@@ -44,7 +44,7 @@ EOF
 resource "aws_cloudwatch_log_group" "state_machine_log_group" {
   name              = var.cloudwatch_log_group_name
   tags              = var.cloudwatch_log_group_tags
-  #kms_key_id        = var.enable_sfn_encyption ? var.cloudwatch_log_group_kms_key_arn : 0
+  kms_key_id        = var.enable_sfn_encyption ? var.cloudwatch_log_group_kms_key_arn : 0
   retention_in_days = var.cloudwatch_log_group_retention_days
 }
 
@@ -72,6 +72,8 @@ resource "aws_iam_role" "iam_for_sfn" {
 
 // Create policies for cloudwatch logging and state machine use
 resource "aws_iam_policy" "policy_sfn_logging" {
+  count = var.create_sfn_logging_policy ? 1 : 0
+  role       = aws_iam_role.iam_for_sfn.name[0].id
   policy = <<EOF
 {
     "Version": "2012-10-17",
@@ -99,6 +101,8 @@ EOF
 }
 
 resource "aws_iam_policy" "policy_sfn_statemachine" {
+  count = var.create_sfn_statemachine_policy ? 1 : 0
+  role       = aws_iam_role.iam_for_sfn.name[0].id
   policy = <<EOF
 {
     "Version": "2012-10-17",
@@ -119,7 +123,8 @@ EOF
 }
 
 resource "aws_iam_policy" "policy_sfn_xray_tracing" {
-  count  = var.xray_tracing_enabled ? 1 : 0
+  count  = var.create_xray_tracing_policy ? 1 : 0
+  role       = aws_iam_role.iam_for_sfn.name[0].id
   policy = <<EOF
 {
     "Version": "2012-10-17",
@@ -140,18 +145,18 @@ EOF
 }
 
 // Attach policies to IAM Role for Step Function
-resource "aws_iam_role_policy_attachment" "iam_for_sfn_attach_policy_cloudwatch" {
-  role       = aws_iam_role.iam_for_sfn.name
-  policy_arn = aws_iam_policy.policy_sfn_logging.arn
-}
+# resource "aws_iam_role_policy_attachment" "iam_for_sfn_attach_policy_cloudwatch" {
+#   role       = aws_iam_role.iam_for_sfn.name[0].id
+#   policy_arn = aws_iam_policy.policy_sfn_logging.arn
+# }
 
-resource "aws_iam_role_policy_attachment" "iam_for_sfn_attach_policy_statemachine" {
-  role       = aws_iam_role.iam_for_sfn.name
-  policy_arn = aws_iam_policy.policy_sfn_statemachine.arn
-}
+# resource "aws_iam_role_policy_attachment" "iam_for_sfn_attach_policy_statemachine" {
+#   role       = aws_iam_role.iam_for_sfn.name[0].id
+#   policy_arn = aws_iam_policy.policy_sfn_statemachine.arn
+# }
 
-resource "aws_iam_role_policy_attachment" "iam_for_sfn_attach_policy_xray_tracing" {
-  count      = var.xray_tracing_enabled ? 1 : 0
-  role       = aws_iam_role.iam_for_sfn.name
-  policy_arn = aws_iam_policy.policy_sfn_xray_tracing[0].arn
-}
+# resource "aws_iam_role_policy_attachment" "iam_for_sfn_attach_policy_xray_tracing" {
+#   count      = var.xray_tracing_enabled ? 1 : 0
+#   role       = aws_iam_role.iam_for_sfn.name[0].id
+#   policy_arn = aws_iam_policy.policy_sfn_xray_tracing[0].arn
+# }
