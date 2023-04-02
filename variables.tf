@@ -54,7 +54,10 @@ variable "xray_tracing_enabled" {
   description = "When set to true, AWS X-Ray tracing is enabled."
   default     = true
 }
-
+variable "create_cloudwatch_log_group" {
+  type = bool
+  default = false
+}
 variable "cloudwatch_log_group_name" {
   type        = string
   description = "The name of the Cloudwatch log group."

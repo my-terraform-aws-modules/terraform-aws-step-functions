@@ -42,6 +42,7 @@ EOF
 
 // Create log group for state machine
 resource "aws_cloudwatch_log_group" "state_machine_log_group" {
+  count = var.create_cloudwatch_log_group ? 1 : 0
   name              = var.cloudwatch_log_group_name
   tags              = var.cloudwatch_log_group_tags
   kms_key_id        = var.enable_sfn_encryption ? var.cloudwatch_log_group_kms_key_arn : 0
