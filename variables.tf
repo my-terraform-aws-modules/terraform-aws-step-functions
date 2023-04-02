@@ -56,7 +56,7 @@ variable "xray_tracing_enabled" {
 }
 variable "create_cloudwatch_log_group" {
   type = bool
-  default = false
+  default = true
 }
 variable "cloudwatch_log_group_name" {
   type        = string

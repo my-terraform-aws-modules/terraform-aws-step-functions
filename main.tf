@@ -6,30 +6,30 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
   count = var.create_sfn ? 1 : 0
   name       = "${var.environment}-${var.state_machine_name}"
   role_arn   = var.create_sfn_role ? aws_iam_role.iam_for_sfn[0].arn : var.custom_sfn_role 
-  # definition = #var.step_function_defination
-  # /* example of defination file
-  definition = <<EOF
-{
-  "Comment": "A Hello World example of the Amazon States Language using Pass states",
-  "StartAt": "Hello",
-  "States": {
-    "Hello": {
-      "Type": "Pass",
-      "Result": "Hello",
-      "Next": "World"
-    },
-    "World": {
-      "Type": "Pass",
-      "Result": "World",
-      "End": true
-    }
-  }
-}
-EOF
+  definition = var.step_function_defination
+#   # /* example of defination file
+#   definition = <<EOF
+# {
+#   "Comment": "A Hello World example of the Amazon States Language using Pass states",
+#   "StartAt": "Hello",
+#   "States": {
+#     "Hello": {
+#       "Type": "Pass",
+#       "Result": "Hello",
+#       "Next": "World"
+#     },
+#     "World": {
+#       "Type": "Pass",
+#       "Result": "World",
+#       "End": true
+#     }
+#   }
+# }
+# EOF
 
   type       = upper(var.type)
   logging_configuration {
-    log_destination        = "${aws_cloudwatch_log_group.state_machine_log_group.arn}:*"
+    log_destination        = "${aws_cloudwatch_log_group.state_machine_log_group[0].arn}:*"
     include_execution_data = var.include_execution_data
     level                  = upper(var.logging_configuration_level)
 
@@ -45,7 +45,7 @@ resource "aws_cloudwatch_log_group" "state_machine_log_group" {
   count = var.create_cloudwatch_log_group ? 1 : 0
   name              = var.cloudwatch_log_group_name
   tags              = var.cloudwatch_log_group_tags
-  kms_key_id        = var.enable_sfn_encryption ? var.cloudwatch_log_group_kms_key_arn : 0
+  kms_key_id        = var.enable_sfn_encryption ? var.cloudwatch_log_group_kms_key_arn : null
   retention_in_days = var.cloudwatch_log_group_retention_days
 }
 
